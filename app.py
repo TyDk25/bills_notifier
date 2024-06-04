@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Response
 from flask_bootstrap import Bootstrap
-from message_sender import check_upcoming_bills
 from database import Bills, session
-from add_new_bill import add_bill_to_database
+from bills import BillsManager
 
 # Create a Flask app instance
 app = Flask(__name__)
@@ -10,6 +9,7 @@ app = Flask(__name__)
 # Initialize Bootstrap extension
 Bootstrap(app)
 
+bills = BillsManager()
 
 @app.route('/')
 def index() -> str:
@@ -31,7 +31,7 @@ def add_bill() -> Response:
     bill_name = request.form.get('Name')
     bill_amount = request.form.get('Amount')
     day = int(request.form.get('Day'))
-    add_bill_to_database(bill_name, bill_amount, day)
+    bills.add_bills_to_database(bill_name, bill_amount, day)
 
     return redirect(url_for('index'))
 
@@ -56,7 +56,7 @@ def check_bills() -> Response:
     Sends SMS message using check_upcoming_bills function.
     :return: Response from website.
     """
-    check_upcoming_bills()
+    bills.check_upcoming_bills()
 
     return redirect(url_for('index'))
 
